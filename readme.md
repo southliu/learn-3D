@@ -19,3 +19,12 @@ const tick = () => {
     window.requestAnimationFrame(tick)
 }
 ```
+
+# 性能优化
+
+## 设置像素比
+```js
+const renderer = new THREE.WebGLRenderer({ canvas })
+// 设置像素比
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+```
