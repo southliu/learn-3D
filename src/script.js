@@ -1,5 +1,6 @@
 import './style.css'
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 /**
  * Base
@@ -51,7 +52,13 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 
 // Animate
-const clock = new THREE.Clock()
+// const clock = new THREE.Clock()
+
+// Controls
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+// controls.target .y = 1
+// controls.update()
 
 const tick = () =>
 {
@@ -59,9 +66,12 @@ const tick = () =>
 
     // Update objects
     // mesh.rotation.y = elapsedTime;
-    camera.position.x = cursor.x * 3
-    camera.position.y = cursor.y * 3
-    camera.lookAt(mesh.position)
+    // camera.position.x = cursor.x * 3
+    // camera.position.y = cursor.y * 3
+    // camera.lookAt(mesh.position)
+
+    // update controls
+    controls.update()
 
     // Render
     renderer.render(scene, camera)
