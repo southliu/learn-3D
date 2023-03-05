@@ -1,6 +1,14 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import gsap from 'gsap'
+import * as dat from 'dat.gui'
+
+/**
+ * Debug
+ */
+const gui = new dat.GUI({ closed: true, width: 400 })
+gui.hide()
 
 /**
  * Base
@@ -8,69 +16,93 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
-/**
- * Cursor
- */
-const cursor = {
-    x: 0,
-    y: 0
-}
-window.addEventListener('mousemove', even => {
-    cursor.x = - (even.clientX / sizes.width - 0.5)
-    cursor.y = even.clientY / sizes.height - 0.5
-    // console.log(cursor.x, cursor.y)
-})
-
-// Sizes
-const sizes = {
-    width: 800,
-    height: 600
-}
-
 // Scene
 const scene = new THREE.Scene()
 
-// Object
-const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1, 5, 5, 5),
-    new THREE.MeshBasicMaterial({ color: 0xff0000 })
-)
+const parameters = {
+    color: 0xff0000,
+    spin: () => {
+        gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + 10 })
+    }
+}
+
+/**
+ * Object
+ */
+const geometry = new THREE.BoxGeometry(1, 1, 1)
+const material = new THREE.MeshBasicMaterial({ color: parameters.color })
+const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
-// Camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.01, 1199)
-camera.position.x = 2
-camera.position.y = 2
-camera.position.z = 2
-camera.lookAt(mesh.position)
-scene.add(camera)
+// Debug
+gui.add(mesh.position, 'x', -3, 3, 0.01)
+gui.add(mesh.position, 'y', -3, 3, 0.01)
+gui.add(mesh.position, 'z').min(-3).max(3).step(0.01).name('position z')
 
-// Renderer
-const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+gui.add(mesh, 'visible')
+
+gui.addColor(parameters, 'color')
+    .onChange(value => {
+        console.log('value:', value)
+        material.color.set(parameters.color)
+    })
+
+gui.add(parameters, 'spin')
+
+/**
+ * Sizes
+ */
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+window.addEventListener('resize', () =>
+{
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
-renderer.setSize(sizes.width, sizes.height)
 
-// Animate
-// const clock = new THREE.Clock()
+/**
+ * Camera
+ */
+// Base camera
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+camera.position.z = 3
+scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
-// controls.target .y = 1
-// controls.update()
+
+/**
+ * Renderer
+ */
+const renderer = new THREE.WebGLRenderer({
+    canvas: canvas
+})
+renderer.setSize(sizes.width, sizes.height)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+/**
+ * Animate
+ */
+const clock = new THREE.Clock()
 
 const tick = () =>
 {
-    // const elapsedTime = clock.getElapsedTime()
+    const elapsedTime = clock.getElapsedTime()
 
-    // Update objects
-    // mesh.rotation.y = elapsedTime;
-    // camera.position.x = cursor.x * 3
-    // camera.position.y = cursor.y * 3
-    // camera.lookAt(mesh.position)
-
-    // update controls
+    // Update controls
     controls.update()
 
     // Render
