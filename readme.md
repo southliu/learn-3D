@@ -44,6 +44,11 @@ const colorTexture = textureLoader.load('/textures/checkerboard-8x8.png')
 colorTexture.magFilter = THREE.NearestFilter
 ```
 
+## gltf压缩
+```
+https://gltf.report
+```
+
 # GUI
 
 ## 快捷键
