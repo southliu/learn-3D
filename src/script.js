@@ -19,118 +19,86 @@ const scene = new THREE.Scene()
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
-const bakedShadow = textureLoader.load('/textures/bakedShadow.jpg')
-const simpleShadow = textureLoader.load('/textures/simpleShadow.jpg')
+
+/**
+ * House
+ */
+const house = new THREE.Group()
+scene.add(house)
+
+// Walls
+const walls = new THREE.Mesh(
+    new THREE.BoxBufferGeometry(4, 2.5, 4),
+    new THREE.MeshStandardMaterial({ color: '#ac8e82' })
+)
+walls.position.y = 2.5 / 2
+house.add(walls)
+
+// Roof
+const roof = new THREE.Mesh(
+    new THREE.ConeGeometry(3.5, 1, 4),
+    new THREE.MeshStandardMaterial({ color: '#b35f45' })
+)
+roof.position.y = 3
+roof.rotation.y = Math.PI / 4
+house.add(roof)
+
+// Door
+const door = new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
+    new THREE.MeshStandardMaterial({ color: '#aa7b7b' })
+)
+door.position.y = 1
+door.position.z = 2 + 0.01
+house.add(door)
+
+// Floor
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshStandardMaterial({ color: '#a9c388' })
+)
+floor.rotation.x = - Math.PI * 0.5
+floor.position.y = 0
+scene.add(floor)
+
+// Bushes
+const bushGeometry = new THREE.SphereGeometry(1, 16, 16)
+const bushMaterial = new THREE.MeshStandardMaterial({ color: '#89c854' })
+
+const bush1 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush1.scale.set(0.5, 0.5, 0.5)
+bush1.position.set(.8, .2, 2.2)
+
+const bush2 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush2.scale.set(0.25, 0.25, 0.25)
+bush2.position.set(1.4, 0.1, 2.1)
+
+const bush3 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush3.scale.set(0.4, 0.4, 0.4)
+bush3.position.set(-0.8, 0.1, 2.2)
+
+const bush4 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush4.scale.set(0.15, 0.15, 0.15)
+bush4.position.set(-1, 0.05, 2.6)
+
+house.add(bush1, bush2, bush3, bush4)
 
 /**
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
+const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
 gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
 scene.add(ambientLight)
 
 // Directional light
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3)
-directionalLight.castShadow = true
-
-directionalLight.shadow.mapSize.width = 1024
-directionalLight.shadow.mapSize.height = 1024
-
-directionalLight.shadow.camera.near = 1
-directionalLight.shadow.camera.far = 6
-
-directionalLight.shadow.camera.top = 2
-directionalLight.shadow.camera.right = 2
-directionalLight.shadow.camera.bottom = - 2
-directionalLight.shadow.camera.left = - 2
-
-directionalLight.position.set(2, 2, - 1)
-gui.add(directionalLight, 'intensity').min(0).max(1).step(0.001)
-gui.add(directionalLight.position, 'x').min(- 5).max(5).step(0.001)
-gui.add(directionalLight.position, 'y').min(- 5).max(5).step(0.001)
-gui.add(directionalLight.position, 'z').min(- 5).max(5).step(0.001)
-scene.add(directionalLight)
-
-const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
-directionalLightCameraHelper.visible = false
-scene.add(directionalLightCameraHelper)
-
-// Spot light
-const spotLight = new THREE.SpotLight(0xffffff, 0.3, 10, Math.PI * 0.3)
-spotLight.castShadow = true
-
-spotLight.shadow.mapSize.width = 1024
-spotLight.shadow.mapSize.height = 1024
-
-spotLight.shadow.camera.near = 1
-spotLight.shadow.camera.far = 6
-
-spotLight.shadow.camera.fov = 30
-
-spotLight.position.set(0, 2, 2)
-scene.add(spotLight)
-scene.add(spotLight.target)
-
-const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera)
-spotLightCameraHelper.visible = false
-scene.add(spotLightCameraHelper)
-
-// Point light
-const pointLight = new THREE.PointLight(0xffffff, 0.3)
-
-pointLight.castShadow = true
-
-pointLight.shadow.mapSize.width = 1024
-pointLight.shadow.mapSize.height = 1024
-
-pointLight.shadow.camera.near = 0.1
-pointLight.shadow.camera.far = 5
-
-pointLight.position.set(- 1, 1, 0)
-scene.add(pointLight)
-
-const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
-pointLightCameraHelper.visible = false
-scene.add(pointLightCameraHelper)
-
-/**
- * Materials
- */
-const material = new THREE.MeshStandardMaterial()
-material.roughness = 0.7
-gui.add(material, 'metalness').min(0).max(1).step(0.001)
-gui.add(material, 'roughness').min(0).max(1).step(0.001)
-
-/**
- * Objects
- */
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 32, 32),
-    material
-)
-sphere.castShadow = true
-
-const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(5, 5),
-    material
-)
-// plane.receiveShadow = true
-plane.rotation.x = - Math.PI * 0.5
-plane.position.y = - 0.5
-
-const sphereShadow = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.5, 1.5),
-    new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        alphaMap: simpleShadow
-    })
-)
-sphereShadow.rotation.x = - Math.PI * 0.5
-sphereShadow.position.y = plane.position.y + 0.01
-
-scene.add(sphere, sphereShadow, plane)
+const moonLight = new THREE.DirectionalLight('#ffffff', 0.5)
+moonLight.position.set(4, 5, - 2)
+gui.add(moonLight, 'intensity').min(0).max(1).step(0.001)
+gui.add(moonLight.position, 'x').min(- 5).max(5).step(0.001)
+gui.add(moonLight.position, 'y').min(- 5).max(5).step(0.001)
+gui.add(moonLight.position, 'z').min(- 5).max(5).step(0.001)
+scene.add(moonLight)
 
 /**
  * Sizes
@@ -160,9 +128,9 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 1
-camera.position.y = 1
-camera.position.z = 2
+camera.position.x = 4
+camera.position.y = 2
+camera.position.z = 5
 scene.add(camera)
 
 // Controls
@@ -175,8 +143,6 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
-renderer.shadowMap.enabled = false
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
@@ -188,16 +154,6 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
-
-    // Update the sphere
-    sphere.position.x = Math.cos(elapsedTime) * 1.5
-    sphere.position.z = Math.sin(elapsedTime) * 1.5
-    sphere.position.y = Math.abs(Math.sin(elapsedTime * 3))
-
-    // Update the shadow
-    sphereShadow.position.x = sphere.position.x
-    sphereShadow.position.z = sphere.position.z
-    sphereShadow.material.opacity = (1 - Math.abs(sphere.position.y)) * 0.3
 
     // Update controls
     controls.update()
